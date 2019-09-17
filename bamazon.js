@@ -1,18 +1,19 @@
-require("dotenv").config();
+// require("dotenv").config();
 var mysql =require('mysql');
 var inquirer = require('inquirer');
 
 var connection = mysql.createConnection({
     host:"localhost",
-    port= 8889,
-    user="root",
-    password= "root",
+    port: 5000,
+    user:"root",
+    password: "root",
     database:"bamazon_db"
-})
+});
 
 connection.connect(function(err){
     if(err) throw err;
     console.log("connection successfull");
+    // displayProcuts();
     makeTable();
 })
 
@@ -32,6 +33,9 @@ var promptCustomer = function(res){
         message:"What would you like to purchase? [Quit with Q]"
     }]).then(function(answer){
         var correct = false;
+        if(answer.choice.toUpperCase()=="Q"){
+            process.exit();
+        }
         for(var i=0; i<res.length;i++){
             if(res[i].product_name==answer.choice){
                 correct=true;
@@ -41,7 +45,7 @@ var promptCustomer = function(res){
                     type:"input",
                     name:"quant",
                     message:"HOW MANY WOULD YOU LIKE TO BUY?",
-                    validate: Function(value){
+                    validate: function(value){
                         if(isNaN(value)==false){
                             return true;
                         } else {
@@ -61,6 +65,10 @@ var promptCustomer = function(res){
                     }
                 })
             }
+        }
+        if(i==res.length && correct==false){
+            console.log("Not a valid selection!");
+            promptCustomer(res);
         }
     })
 }
